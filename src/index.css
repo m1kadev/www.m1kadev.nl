@@ -45,15 +45,15 @@ h1 {
     width: 100vw;
 }
 
-#main-focus>h2 {
+main>h2 {
     font-weight: normal;
 }
 
-#main-focus>p {
+main>p {
     font-weight: lighter;
 }
 
-#main-focus {
+main {
     background-color: #00000080;
     width: 50vw;
     margin: auto;
@@ -67,4 +67,22 @@ footer {
 
 #lynx {
     justify-content: right;
+}
+
+a {
+    color: var(--txt-colour);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-decoration: underline #ffffff80;
+}
+
+#mark>h1,
+#mark>h3 {
+    text-decoration: none;
 }

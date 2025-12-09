@@ -1,6 +1,6 @@
-defmodule Builders do
-  require EEx
+require EEx
 
+defmodule Builders do
   binfo_template = """
   commit=<%= commit %>
   lightningcss=<%= lightningcss %>
@@ -14,7 +14,7 @@ defmodule Builders do
 
     System.cmd("html-minifier-next", [
       "--preset",
-      "comprehensive",
+      "conservative",
       "-o",
       output_path,
       input_path

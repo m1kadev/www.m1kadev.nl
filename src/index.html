@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>home - m1kadev.nl</title>
     <link rel="stylesheet" href="/index.css">
-    <script src="/index.js" defer></script>
+    <script src="/index.js" type="module" defer></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/tokyo-night-dark.min.css">
 </head>
 
 <body>
@@ -15,12 +17,29 @@
         <h1>m1kadev</h1>
     </div>
     <div id="content">
-        <div id="main-focus">
+        <main>
             <h1>Haii :3 i'm mika</h1>
             <p>
-                i'm mika (stylised as m1ka, also m1kadev). i'm your favourite dutch persons favourite dutch person. big
-                fan of rust too. you can reach out to me per e-mail as linked in my github profile. i also respond to
-                discord dms over at m1kadev there.
+                haiii!!! i'm mika (also <em>m1ka</em>, <em>m1kadev</em>). i'm a (mostly backend) developer from <a
+                    href="https://en.wikipedia.org/wiki/Netherlands">The Netherlands</a>. i'm also a big fan of making
+                drinks & cooking.
+            </p>
+            <h3>about me</h3>
+            <p>
+                i do vwo (dutch A-levels) phyiscs in the greater rotterdam area. i've been working on <a
+                    href="https://github.com/m1kadev/fxg">fxg</a>, a markup language in <a
+                    href="https://rust-lang.com">rust</a>. also, i've been playing around with functional programming
+                (mostly in <a href="https://elixir-lang.org/">elixir</a>).
+            </p>
+            <p>
+                Together with 3 other friends, we run <a href="https://dupunkto.org/">{du}punkto</a>
+            </p>
+            <h3>contact</h3>
+            <p>
+                you can reach me at m1kadev on <a href="https://discord.com/">discord</a>, or on my email address at
+            <pre><code class="language-rust">
+                    format!("{2}@{0}.{1}", "dupunkto", "org", "mika")
+            </code></pre>
             </p>
             <hr>
             <footer>
@@ -34,7 +53,7 @@
                     </a>
                 </div>
             </footer>
-        </div>
+        </main>
     </div>
 
 </body>
