@@ -1,7 +1,7 @@
 const fromCommit = document.getElementById("from-commit");
 const buildDate = document.getElementById("build-date");
 
-import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/es/highlight.min.js';
+import hljs from '/static/highlight.min.js';
 import rust from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/es/languages/rust.min.js';
 
 hljs.registerLanguage('rust', rust);

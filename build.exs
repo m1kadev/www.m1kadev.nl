@@ -1,5 +1,10 @@
+require Mix
+
+Mix.install([
+  {:tzdata, "~> 1.1"}
+])
+
 require EEx
-require Tzdata
 
 Calendar.put_time_zone_database(Tzdata.TimeZoneDatabase)
 
@@ -105,10 +110,8 @@ Path.wildcard("static/**/*")
 |> Task.async_stream(fn file -> File.cp(file, "build/" <> file) end)
 |> Enum.to_list()
 
-build_time =
-  DateTime.now("Europe/Amsterdam")
-  |> elem(1)
-  |> Calendar.strftime("%H:%M:%S %d/%m/%y")
+{:ok, date} = DateTime.now("Europe/Amsterdam")
+build_time = Calendar.strftime(date, "%H:%M:%S %d/%m/%y")
 
 File.write(
   "build/info.txt",

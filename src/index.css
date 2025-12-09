@@ -86,3 +86,16 @@ h6 {
 #mark>h3 {
     text-decoration: none;
 }
+
+nav {
+    font-family: "Gothic A1", sans-serif;
+    font-size: large;
+    color: var(--txt-colour);
+    z-index: 10;
+    padding-top: 1em;
+}
+
+nav>a {
+    display: block;
+    text-align: right;
+}
