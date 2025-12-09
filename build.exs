@@ -1,4 +1,7 @@
 require EEx
+require Tzdata
+
+Calendar.put_time_zone_database(Tzdata.TimeZoneDatabase)
 
 defmodule Builders do
   binfo_template = """
@@ -103,7 +106,8 @@ Path.wildcard("static/**/*")
 |> Enum.to_list()
 
 build_time =
-  DateTime.utc_now()
+  DateTime.now("Europe/Amsterdam")
+  |> elem(1)
   |> Calendar.strftime("%H:%M:%S %d/%m/%y")
 
 File.write(
