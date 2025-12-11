@@ -1,0 +1,18 @@
+= haii :3 i'm mika =
+
+haiii!!! i'm mika (also //m1ka//, //m1kadev//). i'm a (mostly backend) developer from <#https://en.wikipedia.org/wiki/Nederland The Netherlands>. i'm also a big fan of making drinks & cooking.
+
+=== about me ===
+
+i do VWO (dutch A-levels) phyiscs in the greater rotterdam area. i've been working on <#https://www.github.com/m1kadev/fxg fxg>, a markup language written in <#https://rust-lang.org/ Rust>. also, i've been playing around with functional programming (mostly in <#https://elixir-lang.org Elixir>).
+
+Together with 3 other friends, we run <#https://dupunkto.org/ {du}punkto>
+
+=== contact ===
+feel free to reach out to me! you can reach me at m1kadev on <#https://discord.com/ discord>, or on my email address at
+
+<rust>
+format!("{2}@{0}.{1}", "dupunkto", "org", "mika")
+</>
+
+this code is to filter out all non-<>format!</> users
