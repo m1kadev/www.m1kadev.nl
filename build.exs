@@ -1,12 +1,9 @@
 require Mix
+require EEx
 
 Mix.install([
   {:tzdata, "~> 1.1"}
 ])
-
-require EEx
-
-# hello
 
 Calendar.put_time_zone_database(Tzdata.TimeZoneDatabase)
 
@@ -76,7 +73,7 @@ defmodule Builders do
   )
 end
 
-{commit, 0} = System.cmd("lightningcss", ["-V"])
+{commit, 0} = System.cmd("git", ["rev-parse", "HEAD"])
 
 {lightningcss, 0} = System.cmd("lightningcss", ["-V"])
 
