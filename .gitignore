@@ -1,11 +1,4 @@
-/_build/
-/cover/
-/deps/
-/doc/
-/tmp/
-erl_crash.dump
-*.ez
-www-*.tar
-/.elixir_ls
-/_build/
 /build
+/static/highlight.min.js
+/static/rust.min.js
+/static/html.min.js

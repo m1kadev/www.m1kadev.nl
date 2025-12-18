@@ -99,3 +99,7 @@ nav>a {
     text-align: right;
     position: relative;
 }
+
+nav>a {
+    padding: .1em;
+}

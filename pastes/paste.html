@@ -6,20 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>home - m1kadev.nl</title>
     <link rel="stylesheet" href="/index.css">
-    <script src="/index.js" type="module" defer></script>
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/tokyo-night-dark.min.css">
+    <link rel="stylesheet" href="/static/arta.min.css">
+    <script src="/static/highlight.min.js"></script>
+    <script src="/static/$LANG.min.js"></script>
+    <script type="module" defer>
+        hljs.highlightAll();
+    </script>
 </head>
 
 <body>
     <div id="content">
         <main>
-            <fxg-content />
+            <h1>$FILENAME</h1>
+            <small id="filemeta">$FILEMETA</small>
+            <pre><code class="language-$LANG">
+$CODE
+            </code></pre>
             <hr>
             <footer>
                 <div id="metadata">
-                    <p>Deployed from commit <code><span id="from-commit"></span></code>, on <span
-                            id="build-date"></span> </p>
+                    <p>Deployed from commit <code><span class="from-commit-short"></span></code>, on <span
+                            class="build-date"></span> </p>
                 </div>
                 <div id="lynx">
                     <a href="https://github.com/m1kadev">
@@ -36,6 +43,9 @@
         <nav>
             <a href="/">home</a>
             <a href="/projects.html">projects</a>
+            <a href="/thoughts/">thoughts</a>
+            <a href="/pastes/">pastes</a>
+            <a href="/colophon.html">colophon</a>
         </nav>
     </div>
 

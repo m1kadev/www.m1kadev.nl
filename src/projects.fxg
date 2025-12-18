@@ -5,4 +5,4 @@
 <#https://github.com/m1kadev/fxg fxg> is my own markup language, written in <#https://rust-lang.org/ Rust>. it aims to maximise readability in text form, and tries to only have one way to write markup (unlike Markdown). you can view <#https://github.com/m1kadev/www.m1kadev.nl/blob/main/src/projects.fxg the source> of this page, if you'd like to see for yourself.
 
 === m1kadev.nl ===
-the site you're on right now! the <#https://github.com/m1kadev/www.m1kadev.nl/blob/main/build.exs generator> for this site is written in elixir. all code for the generator besides <#https://hexdocs.pm/tzdata/readme.html Tzdata, for the build timestamp> is written by me.
+the site you're on right now! the <#https://github.com/m1kadev/www.m1kadev.nl/blob/main/build.exs generator> for this site is written in elixir. all code for the generator (besides <#https://hexdocs.pm/tzdata/readme.html Tzdata>, for the build timestamp) is written by me.
