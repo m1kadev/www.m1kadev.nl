@@ -1,5 +1,5 @@
-= Colophon =
+= colophon =
 
-== About == 
+== about == 
 
 you're looking at a <#https://en.wiktionary.org/wiki/beautiful#English beautiful> site, with <#https://caddyserver.com/ caddy> as its backend. all source pages are written in my own markup language, <#https://github.com/m1kadev/fxg fxg>. site generation is done by a homebrewn <#https://github.com/m1kadev/www.m1kadev.nl/blob/main/build.exs elixir script>. all code (including <#https://github.com/m1kadev/fxg fxg>) is licenced under the MIT licence.

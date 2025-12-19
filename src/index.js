@@ -4,8 +4,6 @@ const htmlMinifierNext = Array.from(document.getElementsByClassName("html-minifi
 const lightningcss = Array.from(document.getElementsByClassName("lightningcss"));
 const uglifyjs = Array.from(document.getElementsByClassName("uglifyjs"));
 
-hljs.highlightAll();
-
 fetch("/info.txt").then(async data => {
    const res = await data.text();
    let map = new Map();

@@ -2,7 +2,8 @@ require Mix
 require EEx
 
 Mix.install([
-  {:tzdata, "~> 1.1"}
+  {:tzdata, "~> 1.1"},
+  {:mustache, "~> 0.5.0"}
 ])
 
 Calendar.put_time_zone_database(Tzdata.TimeZoneDatabase)
@@ -79,47 +80,53 @@ defmodule Builders do
       ])
   end
 
-  def fxg(input_path, template) do
+  def fxg(input_path, template, bricks) do
     own_template = input_path |> String.replace_suffix("fxg", "html")
 
     case File.read(own_template) do
-      {:ok, ctemplate} -> _fxg(input_path, ctemplate)
-      _ -> _fxg(input_path, template)
+      {:ok, ctemplate} -> _fxg(input_path, ctemplate, bricks)
+      _ -> _fxg(input_path, template, bricks)
     end
   end
 
-  def paste(input_path, template) do
-    {:ok, rcode} = File.read(input_path)
+  def paste(input_path, template, bricks) do
+    {:ok, code} = File.read(input_path)
+    IO.inspect(code)
 
     output = "build/" <> input_path <> ".html"
 
-    code =
-      rcode
-      |> String.replace("&", "&amp;")
-      |> String.replace("<", "&lt;")
-      |> String.replace(">", "&gt;")
-
     lang = Path.extname(input_path) |> String.slice(1..-1//1)
     file = Path.basename(input_path)
-    {:ok, %File.Stat{mtime: mtime}} = File.stat(input_path, time: :posix)
+    time = FileX.created(input_path)
 
     result =
-      template
-      |> String.replace("$LANG", lang)
-      |> String.replace("$CODE", code)
-      |> String.replace("$FILENAME", input_path)
-      |> String.replace("$FILEMETA", "Created on " <> Integer.to_string(mtime))
+      Mustache.render(
+        template,
+        Map.merge(
+          %{
+            filename: input_path,
+            about_paste: "Created on " <> time,
+            language: "<script src=\"static/" <> lang <> ".min.js\"></script>",
+            codetag: "<pre><code class=\"language-" <> lang <> "\">",
+            code: code
+          },
+          bricks
+        )
+      )
+
+    IO.inspect(input_path)
 
     :ok = File.write(output, result)
   end
 
-  defp _fxg(input_path, template) do
+  defp _fxg(input_path, template, bricks) do
     output_path =
       String.replace_prefix(input_path, "src", "build")
       |> String.replace_suffix("fxg", "html")
 
-    {output, 0} = System.cmd("fxg", [input_path])
-    output = String.replace(template, "<content />", output)
+    {content, 0} = System.cmd("fxg", [input_path])
+
+    output = Mustache.render(template, Map.merge(%{fxg_content: content}, bricks))
     File.write(output_path, output)
   end
 end
@@ -128,6 +135,12 @@ defmodule FileX do
   def created(path) do
     {:ok, %File.Stat{mtime: {{y, m, d}, _}}} = File.stat(path, time: :local)
     Integer.to_string(d) <> "/" <> Integer.to_string(m) <> "/" <> Integer.to_string(y)
+  end
+
+  def sanitised_name(path) do
+    Path.basename(path)
+    |> String.trim_trailing(".html")
+    |> String.replace("-", "_")
   end
 end
 
@@ -150,6 +163,10 @@ end
 # |> Task.async_stream(fn file -> Builders.html(file) end)
 # |> Enum.to_list()
 
+bricks =
+  Path.wildcard("bricks/*.html")
+  |> Map.new(fn x -> {FileX.sanitised_name(x), File.read!(x)} end)
+
 {:ok, main_template} = File.read("src/index.html")
 
 Path.wildcard("src/**/*.css")
@@ -161,7 +178,7 @@ Path.wildcard("src/**/*.js")
 |> Enum.to_list()
 
 Path.wildcard("src/**/*.fxg")
-|> Task.async_stream(fn file -> Builders.fxg(file, main_template) end)
+|> Task.async_stream(fn file -> Builders.fxg(file, main_template, bricks) end)
 |> Enum.to_list()
 
 Path.wildcard("static/**/*")
@@ -172,10 +189,12 @@ File.mkdir_p("build/pastes")
 
 {:ok, paste_template} = File.read("pastes/paste.html")
 
-pastes = Path.wildcard("pastes/**/*")
+pastes =
+  Path.wildcard("pastes/**/*")
+  |> Enum.filter(fn x -> x != "pastes/paste.html" end)
 
 pastes
-|> Task.async_stream(fn file -> Builders.paste(file, paste_template) end)
+|> Task.async_stream(fn file -> Builders.paste(file, paste_template, bricks) end)
 |> Enum.to_list()
 
 # i cant test this :)) hope it works
@@ -190,9 +209,13 @@ pastes_header = """
 <hr>
 """
 
+# main_template
+# |> String.replace("<content />", pastes_header <> "<p>" <> paste_data <> "</p>")
 paste_index =
-  main_template
-  |> String.replace("<content />", pastes_header <> "<p>" <> paste_data <> "</p>")
+  Mustache.render(
+    main_template,
+    Map.merge(bricks, %{fxg_content: pastes_header <> "<p>" <> paste_data <> "</p>"})
+  )
 
 File.write("build/pastes/index.html", paste_index)
 

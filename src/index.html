@@ -2,47 +2,26 @@
 <html lang="en-GB">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>home - m1kadev.nl</title>
-    <link rel="stylesheet" href="/index.css">
 
-    <script src="/static/highlight.min.js"></script>
+    {{ &base_header }}
+
+    {{ &highlight }}
+
     <script src="/static/rust.min.js"></script>
-    <script src="/index.js" defer></script>
-    <link rel="stylesheet" href="/static/arta.min.css">
+
+    <title>home - m1kadev</title>
 </head>
 
 <body>
     <div id="content">
         <main>
-            <content />
+            {{ &fxg_content }}
             <hr>
-            <footer>
-                <div id="metadata">
-                    <p>Deployed from commit <code><span class="from-commit-short"></span></code>, on <span
-                            class="build-date"></span> </p>
-                </div>
-                <div id="lynx">
-                    <a href="https://github.com/m1kadev">
-                        <img src="/static/github-mark-white.svg" width="32" height="32" alt="GitHub logo">
-                    </a>
-                </div>
-            </footer>
+            {{ &footer }}
         </main>
     </div>
 
-    <div id="mark">
-        <h3>.nl</h3>
-        <h1>m1kadev</h1>
-        <nav>
-            <a href="/">home</a>
-            <a href="/projects.html">projects</a>
-            <a href="/thoughts/">thoughts</a>
-            <a href="/pastes/">pastes</a>
-            <a href="/colophon.html">colophon</a>
-        </nav>
-    </div>
+    {{ &navbar }}
 
 </body>
 

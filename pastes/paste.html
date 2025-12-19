@@ -2,52 +2,25 @@
 <html lang="en-GB">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>home - m1kadev.nl</title>
-    <link rel="stylesheet" href="/index.css">
-    <link rel="stylesheet" href="/static/arta.min.css">
-    <script src="/static/highlight.min.js"></script>
-    <script src="/static/$LANG.min.js"></script>
-    <script defer>
-        hljs.highlightAll();
-    </script>
+    {{ &base_header }}
+
+    {{ &language }}
+    {{ &highlight }}
 </head>
 
 <body>
     <div id="content">
         <main>
-            <h1>$FILENAME</h1>
-            <small id="filemeta">$FILEMETA</small>
-            <pre><code class="language-$LANG">
-$CODE
-            </code></pre>
+            <h1>{{ filename }}</h1>
+            <p>{{ about_paste }}</p>
             <hr>
-            <footer>
-                <div id="metadata">
-                    <p>Deployed from commit <code><span class="from-commit-short"></span></code>, on <span
-                            class="build-date"></span> </p>
-                </div>
-                <div id="lynx">
-                    <a href="https://github.com/m1kadev">
-                        <img src="/static/github-mark-white.svg" width="32" height="32" alt="GitHub logo">
-                    </a>
-                </div>
-            </footer>
+            {{ &codetag }}{{ code }}</code></pre>
+            <hr>
+            {{ &footer }}
         </main>
     </div>
 
-    <div id="mark">
-        <h3>.nl</h3>
-        <h1>m1kadev</h1>
-        <nav>
-            <a href="/">home</a>
-            <a href="/projects.html">projects</a>
-            <a href="/thoughts/">thoughts</a>
-            <a href="/pastes/">pastes</a>
-            <a href="/colophon.html">colophon</a>
-        </nav>
-    </div>
+    {{ &navbar }}
 
 </body>
 
