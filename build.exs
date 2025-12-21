@@ -81,7 +81,10 @@ defmodule Builders do
   end
 
   def fxg(input_path, template, bricks) do
-    own_template = input_path |> String.replace_suffix("fxg", "html")
+    own_template =
+      input_path
+      |> String.replace_prefix("src", "templates/pages")
+      |> String.replace_suffix("fxg", "html")
 
     case File.read(own_template) do
       {:ok, ctemplate} -> _fxg(input_path, ctemplate, bricks)
@@ -134,7 +137,7 @@ end
 defmodule FileX do
   def created(path) do
     {:ok, %File.Stat{mtime: {{y, m, d}, _}}} = File.stat(path, time: :local)
-    Integer.to_string(d) <> "/" <> Integer.to_string(m) <> "/" <> Integer.to_string(y)
+    "#{d}/#{m}/#{y}"
   end
 
   def sanitised_name(path) do
@@ -167,7 +170,7 @@ bricks =
   Path.wildcard("bricks/*.html")
   |> Map.new(fn x -> {FileX.sanitised_name(x), File.read!(x)} end)
 
-{:ok, main_template} = File.read("src/index.html")
+{:ok, main_template} = File.read("templates/base.html")
 
 Path.wildcard("src/**/*.css")
 |> Task.async_stream(fn file -> Builders.css(file) end)
@@ -187,11 +190,10 @@ Path.wildcard("static/**/*")
 
 File.mkdir_p("build/pastes")
 
-{:ok, paste_template} = File.read("pastes/paste.html")
+{:ok, paste_template} = File.read("templates/paste.html")
 
 pastes =
   Path.wildcard("pastes/**/*")
-  |> Enum.filter(fn x -> x != "pastes/paste.html" end)
 
 pastes
 |> Task.async_stream(fn file -> Builders.paste(file, paste_template, bricks) end)
