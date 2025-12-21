@@ -8,6 +8,13 @@ Mix.install([
 
 Calendar.put_time_zone_database(Tzdata.TimeZoneDatabase)
 
+defmodule Git do
+  def get_file_commit(path) do
+    {ts_string, 0} = System.cmd("git", ["log", "--format=%ct", path])
+    String.to_integer(String.trim_trailing(ts_string))
+  end
+end
+
 defmodule Templates do
   binfo_template = """
   commit=<%= commit %>lightningcss=<%= lightningcss %>html_minifier_next=<%= html_minifier_next %>uglifyjs=<%= uglifyjs %>build_time=<%= build_time %>
@@ -210,9 +217,9 @@ File.mkdir_p("build/pastes")
 
 pastes =
   Path.wildcard("pastes/**/*")
-  |> Enum.map(fn x -> {x, FileX.created(x)} end)
+  |> Enum.map(fn path -> {path, Git.get_file_commit(path)} end)
   |> Enum.sort_by(fn {_, t} -> t end, :desc)
-  |> Enum.map(fn {x, _} -> x end)
+  |> Enum.map(fn {path, _} -> path end)
 
 pastes
 |> Task.async_stream(fn file -> Builders.paste(file, paste_template, bricks) end)
@@ -245,7 +252,7 @@ thoughts_template = File.read!("templates/thoughts.html")
 
 thoughts =
   Path.wildcard("thoughts/**/*")
-  |> Enum.map(fn path -> {path, FileX.created(path)} end)
+  |> Enum.map(fn path -> {path, Git.get_file_commit(path)} end)
   |> Enum.sort_by(fn {_, t} -> t end, :desc)
   |> Enum.map(fn {path, date} -> Builders.thought(path, date) end)
   |> Enum.join("<hr>")
