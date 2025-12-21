@@ -1,0 +1,21 @@
+.thought {
+    display: block;
+    /*background-color: #00000050;*/
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.thought>h3 {
+    padding-top: .2em;
+}
+
+.thought>span {
+    display: block;
+    padding-left: .5em;
+    font-style: italic;
+}
+
+.thought>small {
+    text-align: right;
+    display: block;
+}

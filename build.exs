@@ -100,7 +100,7 @@ defmodule Builders do
 
     lang = Path.extname(input_path) |> String.slice(1..-1//1)
     file = Path.basename(input_path)
-    time = FileX.created(input_path)
+    time = FileX.createdf(input_path)
 
     result =
       Mustache.render(
@@ -132,12 +132,32 @@ defmodule Builders do
     output = Mustache.render(template, Map.merge(%{fxg_content: content}, bricks))
     File.write(output_path, output)
   end
+
+  def thought(path, unix) do
+    thought = File.read!(path)
+    name = String.replace_prefix(path, "thoughts/", "")
+
+    date = DateTime.from_unix!(unix) |> Calendar.strftime("%d/%m/%y (%H:%M)")
+
+    """
+    <div class="thought">
+    <h3>#{name}</h3>
+    <span>#{thought}</span>
+    <small> -mika, #{date}</small>
+    </div>
+    """
+  end
 end
 
 defmodule FileX do
-  def created(path) do
+  def createdf(path) do
     {:ok, %File.Stat{mtime: {{y, m, d}, _}}} = File.stat(path, time: :local)
     "#{d}/#{m}/#{y}"
+  end
+
+  def created(path) do
+    {:ok, %File.Stat{mtime: x}} = File.stat(path, time: :posix)
+    x
   end
 
   def sanitised_name(path) do
@@ -161,10 +181,6 @@ case File.mkdir_p("build/static") do
   :ok -> {}
   _ -> raise "Couldn't create the build file structure (/build/static)"
 end
-
-# Path.wildcard("src/**/*.html")
-# |> Task.async_stream(fn file -> Builders.html(file) end)
-# |> Enum.to_list()
 
 bricks =
   Path.wildcard("bricks/*.html")
@@ -194,14 +210,16 @@ File.mkdir_p("build/pastes")
 
 pastes =
   Path.wildcard("pastes/**/*")
+  |> Enum.map(fn x -> {x, FileX.created(x)} end)
+  |> Enum.sort_by(fn {_, t} -> t end, :desc)
+  |> Enum.map(fn {x, _} -> x end)
 
 pastes
 |> Task.async_stream(fn file -> Builders.paste(file, paste_template, bricks) end)
 |> Enum.to_list()
 
-# i cant test this :)) hope it works
 paste_data =
-  Map.new(pastes, fn x -> {x, FileX.created(x)} end)
+  Map.new(pastes, fn x -> {x, FileX.createdf(x)} end)
   |> Enum.map(fn {x, y} -> Templates.pastelink(x, x, y) end)
   |> Enum.join("<br>")
 
@@ -220,6 +238,21 @@ paste_index =
   )
 
 File.write("build/pastes/index.html", paste_index)
+
+File.mkdir_p("build/thoughts")
+
+thoughts_template = File.read!("templates/thoughts.html")
+
+thoughts =
+  Path.wildcard("thoughts/**/*")
+  |> Enum.map(fn path -> {path, FileX.created(path)} end)
+  |> Enum.sort_by(fn {_, t} -> t end, :desc)
+  |> Enum.map(fn {path, date} -> Builders.thought(path, date) end)
+  |> Enum.join("<hr>")
+
+thoughts_html = Mustache.render(thoughts_template, Map.merge(bricks, %{fxg_content: thoughts}))
+
+File.write("build/thoughts/index.html", thoughts_html)
 
 {:ok, date} = DateTime.now("Europe/Amsterdam")
 build_time = Calendar.strftime(date, "%H:%M:%S %d/%m/%y")
