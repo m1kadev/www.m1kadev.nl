@@ -149,7 +149,7 @@ defmodule Builders do
 
     """
     <div class="thought">
-    <h3>#{name}</h3>
+    <h3><a href="/thoughts/#{FileX.sanitised_name(name)}.html">#{name}</a></h3>
     <span>#{thought}</span>
     <small> -mika, #{date}</small>
     </div>
@@ -172,6 +172,7 @@ defmodule FileX do
     Path.basename(path)
     |> String.trim_trailing(".html")
     |> String.replace("-", "_")
+    |> String.replace(" ", "_")
   end
 end
 
@@ -253,15 +254,27 @@ File.write("build/pastes/index.html", paste_index)
 File.mkdir_p("build/thoughts")
 
 thoughts_template = File.read!("templates/thoughts.html")
+thought_template = File.read!("templates/thought.html")
 
-thoughts =
+thought_paths =
   Path.wildcard("thoughts/**/*")
   |> Enum.map(fn path -> {path, Git.get_file_commit(path)} end)
   |> Enum.sort_by(fn {_, t} -> t end, :desc)
-  |> Enum.map(fn {path, date} -> Builders.thought(path, date) end)
-  |> Enum.join("<hr>")
 
-thoughts_html = Mustache.render(thoughts_template, Map.merge(bricks, %{fxg_content: thoughts}))
+thoughts = Enum.map(thought_paths, fn {path, date} -> Builders.thought(path, date) end)
+
+thoughts_html =
+  Mustache.render(
+    thoughts_template,
+    Map.merge(bricks, %{fxg_content: Enum.join(thoughts, "<hr>")})
+  )
+
+for {thought, {path, _}} <- Enum.zip(thoughts, thought_paths) do
+  output_path = "build/thoughts/" <> FileX.sanitised_name(path) <> ".html"
+  IO.inspect(output_path)
+  thought_html = Mustache.render(thought_template, Map.merge(bricks, %{fxg_content: thought}))
+  File.write(output_path, thought_html)
+end
 
 File.write("build/thoughts/index.html", thoughts_html)
 

@@ -1,0 +1,17 @@
+.thought>h3 {
+    font-size: xx-large;
+    margin: 0px;
+    padding-top: .1em;
+    padding-bottom: .5em;
+}
+
+.thought>span {
+    display: block;
+    padding-left: 1.5em;
+    font-style: italic;
+}
+
+.thought>small {
+    text-align: right;
+    display: block;
+}
