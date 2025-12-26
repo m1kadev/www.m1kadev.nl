@@ -64,7 +64,7 @@ defmodule Builders do
   end
 
   def css(input_path) do
-    output_path = String.replace_prefix(input_path, "src", "build")
+    output_path = "build/" <> input_path
 
     {_, 0} =
       System.cmd("lightningcss", [
@@ -76,7 +76,7 @@ defmodule Builders do
   end
 
   def js(input_path) do
-    output_path = String.replace_prefix(input_path, "src", "build")
+    output_path = "build/" <> input_path
 
     {_, 0} =
       System.cmd("uglifyjs", [
@@ -131,13 +131,14 @@ defmodule Builders do
 
   defp _fxg(input_path, template, bricks) do
     output_path =
-      String.replace_prefix(input_path, "src", "build")
+      String.replace_prefix(input_path, "pages", "build")
       |> String.replace_suffix("fxg", "html")
 
     {content, 0} = System.cmd("fxg", [input_path])
 
     output = Mustache.render(template, Map.merge(%{fxg_content: content}, bricks))
-    File.write(output_path, output)
+    IO.inspect(output_path)
+    :ok = File.write(output_path, output)
   end
 
   def thought(path, unix) do
@@ -184,10 +185,7 @@ end
 
 File.rm_rf("build")
 
-case File.mkdir_p("build/static") do
-  :ok -> {}
-  _ -> raise "Couldn't create the build file structure (/build/static)"
-end
+File.mkdir_p!("build")
 
 bricks =
   Path.wildcard("bricks/*.html")
@@ -195,20 +193,26 @@ bricks =
 
 {:ok, main_template} = File.read("templates/base.html")
 
-Path.wildcard("src/**/*.css")
-|> Task.async_stream(fn file -> Builders.css(file) end)
-|> Enum.to_list()
-
-Path.wildcard("src/**/*.js")
-|> Task.async_stream(fn file -> Builders.js(file) end)
-|> Enum.to_list()
-
-Path.wildcard("src/**/*.fxg")
+Path.wildcard("pages/**/*.fxg")
 |> Task.async_stream(fn file -> Builders.fxg(file, main_template, bricks) end)
 |> Enum.to_list()
 
+File.mkdir_p!("build/static")
+
 Path.wildcard("static/**/*")
 |> Task.async_stream(fn file -> File.cp(file, "build/" <> file) end)
+|> Enum.to_list()
+
+File.mkdir_p!("build/scripts")
+
+Path.wildcard("scripts/**/*.js")
+|> Task.async_stream(fn file -> Builders.js(file) end)
+|> Enum.to_list()
+
+File.mkdir_p!("build/styles")
+
+Path.wildcard("styles/**/*.css")
+|> Task.async_stream(fn file -> Builders.css(file) end)
 |> Enum.to_list()
 
 File.mkdir_p("build/pastes")

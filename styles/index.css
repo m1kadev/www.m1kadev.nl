@@ -1,0 +1,15 @@
+#motd {
+    position: absolute;
+    color: var(--txt-colour);
+    width: 100vw;
+    font-family: "Space Grotesk", sans-serif;
+}
+
+#motd>h2 {
+    position: relative;
+    float: right;
+    writing-mode: vertical-lr;
+    text-decoration: none;
+    margin: 0;
+    padding: .5em;
+}
