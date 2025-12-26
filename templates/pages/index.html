@@ -8,15 +8,16 @@
     {{ &highlight }}
 
     <script src="/static/rs.min.js"></script>
+    <script src="/scripts/showMotd.js" defer></script>
     <link rel="stylesheet" href="/styles/index.css">
 
     <title>home - m1kadev</title>
 </head>
 
 <body>
-    <div id="motd">
-        <h2></h2>
-    </div>
+
+    {{ &navbar }}
+
     <div id="content">
         <main>
             {{ &fxg_content }}
@@ -25,8 +26,9 @@
         </main>
     </div>
 
-    {{ &navbar }}
-
+    <div id="motd">
+        <h2></h2>
+    </div>
 </body>
 
 </html>

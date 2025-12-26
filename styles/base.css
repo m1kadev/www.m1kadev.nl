@@ -11,6 +11,10 @@ html {
     margin: 0px;
 }
 
+body {
+    display: flex;
+}
+
 h1 {
     margin: 0px;
 }
@@ -39,10 +43,9 @@ h1 {
 #content {
     font-family: "Gothic A1", sans-serif;
     color: var(--txt-colour);
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100vw;
+    width: 50vw;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 main>h2 {
@@ -55,8 +58,10 @@ main>p {
 
 main {
     background-color: #00000080;
-    width: 50vw;
-    margin: auto;
+    width: 60vw;
+    position: absolute;
+    left: 20vw;
+    top: 0px;
     padding: 2em;
 }
 

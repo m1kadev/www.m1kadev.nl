@@ -90,7 +90,7 @@ defmodule Builders do
   def fxg(input_path, template, bricks) do
     own_template =
       input_path
-      |> String.replace_prefix("src", "templates/pages")
+      |> String.replace_prefix("pages", "templates/pages")
       |> String.replace_suffix("fxg", "html")
 
     case File.read(own_template) do
