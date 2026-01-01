@@ -344,7 +344,7 @@ for {thought, {path, time}} <- Enum.zip(thoughts, thought_paths) do
           Templates.ogp(
             thought,
             "https://m1kadev.nl/#{String.replace_prefix(output_path, "build/", "")}",
-            thought_txt
+            String.replace(thought_txt, "\"", "&qout;")
           )
       })
     )
