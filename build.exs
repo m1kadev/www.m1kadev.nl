@@ -47,6 +47,18 @@ defmodule Templates do
       :date
     ]
   )
+
+  def ogp(title, url, description) do
+    """
+      <meta property="og:type" content="website">
+      <meta property="og:title" content="#{title}">
+      <meta property="og:url" content="#{url}">
+      <meta property="og:image" content="https://m1kadev.nl/static/logo.png">
+      <meta property="og:description" content="#{description}">
+      <meta property="og:locale" content="en_GB" />
+      <meta property="og:site_name" content="m1kadev.nl" />
+    """
+  end
 end
 
 defmodule Builders do
@@ -118,7 +130,9 @@ defmodule Builders do
             about_paste: "Created on " <> time,
             language: "<script src=\"static/" <> lang <> ".min.js\"></script>",
             codetag: "<pre><code class=\"language-" <> lang <> "\">",
-            code: code
+            code: code,
+            ogp:
+              Templates.ogp(file, "https://m1kadev.nl/pastes/#{file}.html", "Created on " <> time)
           },
           bricks
         )
@@ -142,7 +156,26 @@ defmodule Builders do
 
     {content, 0} = System.cmd("fxg", [input_path])
 
-    output = Mustache.render(template, Map.merge(%{fxg_content: content, location: name}, bricks))
+    ogp =
+      Templates.ogp(
+        name,
+        "https://m1kadev.nl/#{String.replace_prefix(output_path, "build/", "")}",
+        ""
+      )
+
+    output =
+      Mustache.render(
+        template,
+        Map.merge(
+          %{
+            fxg_content: content,
+            location: name,
+            ogp: ogp
+          },
+          bricks
+        )
+      )
+
     IO.inspect(output_path)
     :ok = File.write(output_path, output)
   end
@@ -254,7 +287,13 @@ paste_index =
     main_template,
     Map.merge(bricks, %{
       fxg_content: pastes_header <> "<p>" <> paste_data <> "</p>",
-      location: "pastes"
+      location: "pastes",
+      ogp:
+        Templates.ogp(
+          "thoughts",
+          "https://m1kadev.nl/pastes",
+          "random code snippets i found useful or wanted to save :))"
+        )
     })
   )
 
@@ -275,7 +314,16 @@ thoughts = Enum.map(thought_paths, fn {path, date} -> Builders.thought(path, dat
 thoughts_html =
   Mustache.render(
     thoughts_template,
-    Map.merge(bricks, %{fxg_content: Enum.join(thoughts, "<hr>"), location: "thoughts"})
+    Map.merge(bricks, %{
+      fxg_content: Enum.join(thoughts, "<hr>"),
+      location: "thoughts",
+      ogp:
+        Templates.ogp(
+          "thoughts",
+          "https://m1kadev.nl/thoughts",
+          "important thoughts that needed publishing"
+        )
+    })
   )
 
 for {thought, {path, time}} <- Enum.zip(thoughts, thought_paths) do
@@ -283,17 +331,30 @@ for {thought, {path, time}} <- Enum.zip(thoughts, thought_paths) do
   output_path = "build/thoughts/" <> thought <> ".html"
 
   when_said = DateTime.from_unix!(time) |> Calendar.strftime("%H:%M, %d/%m/%y")
+  thought_txt = File.read!(path)
 
   thought_html =
     Mustache.render(
       thought_template,
-      Map.merge(bricks, %{fxg_content: File.read!(path), thought: thought, date: when_said})
+      Map.merge(bricks, %{
+        fxg_content: thought_txt,
+        thought: thought,
+        date: when_said,
+        ogp:
+          Templates.ogp(
+            thought,
+            "https://m1kadev.nl/#{String.replace_prefix(output_path, "build/", "")}",
+            thought_txt
+          )
+      })
     )
 
   File.write(output_path, thought_html)
 end
 
 File.write("build/thoughts/index.html", thoughts_html)
+
+File.copy("favicon.ico", "build/favicon.ico")
 
 {:ok, date} = DateTime.now("Europe/Amsterdam")
 build_time = Calendar.strftime(date, "%H:%M:%S %d/%m/%y")
