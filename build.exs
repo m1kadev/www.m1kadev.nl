@@ -114,7 +114,7 @@ defmodule Builders do
         template,
         Map.merge(
           %{
-            filename: input_path,
+            filename: file,
             about_paste: "Created on " <> time,
             language: "<script src=\"static/" <> lang <> ".min.js\"></script>",
             codetag: "<pre><code class=\"language-" <> lang <> "\">",
@@ -134,9 +134,15 @@ defmodule Builders do
       String.replace_prefix(input_path, "pages", "build")
       |> String.replace_suffix("fxg", "html")
 
+    name =
+      case Path.basename(input_path) |> Path.rootname() do
+        "index" -> "home"
+        x -> x
+      end
+
     {content, 0} = System.cmd("fxg", [input_path])
 
-    output = Mustache.render(template, Map.merge(%{fxg_content: content}, bricks))
+    output = Mustache.render(template, Map.merge(%{fxg_content: content, location: name}, bricks))
     IO.inspect(output_path)
     :ok = File.write(output_path, output)
   end
@@ -246,7 +252,10 @@ pastes_header = """
 paste_index =
   Mustache.render(
     main_template,
-    Map.merge(bricks, %{fxg_content: pastes_header <> "<p>" <> paste_data <> "</p>"})
+    Map.merge(bricks, %{
+      fxg_content: pastes_header <> "<p>" <> paste_data <> "</p>",
+      location: "pastes"
+    })
   )
 
 File.write("build/pastes/index.html", paste_index)
@@ -266,13 +275,21 @@ thoughts = Enum.map(thought_paths, fn {path, date} -> Builders.thought(path, dat
 thoughts_html =
   Mustache.render(
     thoughts_template,
-    Map.merge(bricks, %{fxg_content: Enum.join(thoughts, "<hr>")})
+    Map.merge(bricks, %{fxg_content: Enum.join(thoughts, "<hr>"), location: "thoughts"})
   )
 
-for {thought, {path, _}} <- Enum.zip(thoughts, thought_paths) do
-  output_path = "build/thoughts/" <> FileX.sanitised_name(path) <> ".html"
-  IO.inspect(output_path)
-  thought_html = Mustache.render(thought_template, Map.merge(bricks, %{fxg_content: thought}))
+for {thought, {path, time}} <- Enum.zip(thoughts, thought_paths) do
+  thought = FileX.sanitised_name(path)
+  output_path = "build/thoughts/" <> thought <> ".html"
+
+  when_said = DateTime.from_unix!(time) |> Calendar.strftime("%H:%M, %d/%m/%y")
+
+  thought_html =
+    Mustache.render(
+      thought_template,
+      Map.merge(bricks, %{fxg_content: File.read!(path), thought: thought, date: when_said})
+    )
+
   File.write(output_path, thought_html)
 end
 

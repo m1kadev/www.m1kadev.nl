@@ -7,7 +7,7 @@
 
     <link rel="stylesheet" href="/styles/thought.css">
 
-    <title>home - m1kadev</title>
+    <title> {{ thought }} - m1kadev</title>
 </head>
 
 <body>
@@ -16,7 +16,11 @@
 
     <div id="content">
         <main>
-            {{ &fxg_content }}
+            <h2> {{ thought }} </h2>
+            <span id="thought">
+                {{ &fxg_content }}
+            </span>
+            <small>-mika, {{ date }}</small>
             <hr>
             {{ &footer }}
         </main>
