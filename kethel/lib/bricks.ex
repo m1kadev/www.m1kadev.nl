@@ -8,10 +8,9 @@ defmodule Bricks do
   @typedoc "A valid mustache template"
   @type mustache() :: binary()
 
-  @spec collect(relative_path()) :: [ { brick_name(), mustache() } ]
+  @spec collect(relative_path()) :: %{ brick_name() => mustache() }
   def collect(folder) do
     Path.wildcard(folder <> "/bricks/*.thtml")
-      |> Enum.map(fn brick -> { brick, File.read!(brick) } end) 
-      |> Enum.map(fn { brick, contents } -> { FileX.trimmed_filename(brick), contents } end) # "../bricks/base_header.html" would beccome just "base_header"
+      |> Map.new(fn x -> { FileX.trimmed_filename(x), File.read!(x) } end)
   end
  end 

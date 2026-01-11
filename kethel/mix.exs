@@ -13,8 +13,8 @@ defmodule Kethel.MixProject do
 
   defp deps do
     [
-      { :tzdata, "~> 1.1" },
-      { :mustache, "~> 0.5.0" }
+      { :mustache, "~> 0.5.0" },
+      {:rambo, "~> 0.3.4" },
     ]
   end
 end
