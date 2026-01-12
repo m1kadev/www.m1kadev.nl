@@ -4,6 +4,6 @@ defmodule FileX do
 
   @spec trimmed_filename(path()) :: binary()
   def trimmed_filename(path) do
-    Path.basename(path) |> Path.rootname()
+    Path.basename(path) |> Path.rootname() |> String.replace("-", "_")
   end
 end

@@ -1,0 +1,12 @@
+{
+  "name": "kethel",
+  "version": "0.1.0",
+  "description": "My own build system",
+  "author": "m1kadev",
+  "license": "MIT",
+  "dependencies": {
+    "html-minifier-next": "^4.17.0",
+    "lightningcss-cli": "^1.30.2",
+    "uglify-js": "^3.19.3"
+  }
+}

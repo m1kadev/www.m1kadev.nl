@@ -26,6 +26,8 @@ defmodule Pages do
     Task.async_stream(pages.source_files, fn page -> compile_file(pages, page) end) |> Enum.to_list()
   end
 
+  @doc "compiles a file, already read into process memory. Does not return the binary, but instantly writes it to disk"
+  @spec compile_file(%Pages{}, {  }) :: none()
   defp compile_file(pages, { page_path, page_data }) do
     output_path = "#{pages.project_root}/build#{page_path}.html"
     IO.puts("#{pages.project_root}/pages#{page_path}.fxg -> #{output_path}")
@@ -40,8 +42,9 @@ defmodule Pages do
     page_rendered = Mustache.render(template, mustache_context)
     File.write!(output_path, page_rendered)
   end
-
-  # TODO: switch this to Rambo
+  
+  @doc "Invokes the fxg compiler, a la `fxg -`, piping `data` into the process stdin, and reading the stdout. "
+  @spec invoke_fxg(binary()) :: binary()
   defp invoke_fxg(data) do
     {:ok, res} = Rambo.run("fxg", ["-"], in: data)
     res.out
