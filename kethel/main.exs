@@ -3,19 +3,31 @@ args = System.argv()
 folder = Enum.at(args, 1)
 
 if folder != nil do
-  project_root = Path.expand(folder) 
-  context = %Context{
-    project_root: project_root,
-    bricks: Bricks.collect(project_root),
-    fxg: System.find_executable("fxg")
-  }
-  
+  project_root = Path.expand(folder)
+
   File.rm_rf!("#{project_root}/build")
   File.mkdir_p("#{project_root}/build")
 
-  pages = Pages.collect(context)
+  # other contents depend on this, so we cant async it
+  bricks = Bricks.collect(project_root)
 
-  Pages.compile(pages)
+  # special case, see module documentation
+  statics_task = Task.async(fn -> Statics.compile(project_root) end)
+
+  styles_task = Task.async(fn -> Styles.collect(project_root) end)
+  pages_task = Task.async(fn -> Pages.collect(project_root, bricks) end)
+  scripts_task = Task.async(fn -> Scripts.collect(project_root) end)
+
+  [styles, pages, scripts] = Task.await_many([styles_task, pages_task, scripts_task], :infinity)
+
+  pages_compile_task = Task.async(fn -> Pages.compile(pages) end)
+  styles_compile_task = Task.async(fn -> Styles.compile(styles) end)
+  scripts_compile_task = Task.async(fn -> Scripts.compile(scripts) end)
+
+  Task.await_many(
+    [pages_compile_task, styles_compile_task, statics_task, scripts_compile_task],
+    :infinity
+  )
 else
   IO.puts(:stderr, "The root project folder should be provided on the command line")
 end

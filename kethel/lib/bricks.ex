@@ -8,9 +8,11 @@ defmodule Bricks do
   @typedoc "A valid mustache template"
   @type mustache() :: binary()
 
-  @spec collect(relative_path()) :: %{ brick_name() => mustache() }
+  @type bricks() :: %{brick_name() => mustache()}
+
+  @spec collect(relative_path()) :: bricks()
   def collect(folder) do
     Path.wildcard(folder <> "/bricks/*.thtml")
-      |> Map.new(fn x -> { FileX.trimmed_filename(x), File.read!(x) } end)
+    |> Map.new(fn x -> {FileX.trimmed_filename(x), File.read!(x)} end)
   end
- end 
+end

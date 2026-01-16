@@ -1,3 +1,3 @@
 defmodule Context do
-  defstruct project_root: "/", bricks: %{}, fxg: "fxg"
+  defstruct project_root: "/", fxg: "fxg"
 end
