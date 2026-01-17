@@ -15,17 +15,26 @@ if folder != nil do
   statics_task = Task.async(fn -> Statics.compile(project_root) end)
 
   styles_task = Task.async(fn -> Styles.collect(project_root) end)
-  pages_task = Task.async(fn -> Pages.collect(project_root, bricks) end)
   scripts_task = Task.async(fn -> Scripts.collect(project_root) end)
+  pages_task = Task.async(fn -> Pages.collect(project_root, bricks) end)
+  thoughts_task = Task.async(fn -> Thoughts.collect(project_root, bricks) end)
 
-  [styles, pages, scripts] = Task.await_many([styles_task, pages_task, scripts_task], :infinity)
+  [styles, pages, scripts, thoughts] =
+    Task.await_many([styles_task, pages_task, scripts_task, thoughts_task], :infinity)
 
   pages_compile_task = Task.async(fn -> Pages.compile(pages) end)
   styles_compile_task = Task.async(fn -> Styles.compile(styles) end)
   scripts_compile_task = Task.async(fn -> Scripts.compile(scripts) end)
+  thoughts_compile_task = Task.async(fn -> Thoughts.compile(thoughts) end)
 
   Task.await_many(
-    [pages_compile_task, styles_compile_task, statics_task, scripts_compile_task],
+    [
+      pages_compile_task,
+      styles_compile_task,
+      statics_task,
+      scripts_compile_task,
+      thoughts_compile_task
+    ],
     :infinity
   )
 else
