@@ -28,8 +28,11 @@ defmodule Pages do
 
   @spec compile(%Pages{}) :: none()
   def compile(pages) do
+    t_begin = System.monotonic_time(:millisecond)
     Task.async_stream(pages.source_files, fn page -> compile_file(pages, page) end)
     |> Enum.to_list()
+    t_end = System.monotonic_time(:millisecond)
+    t_end - t_begin 
   end
 
   # doc "compiles a file, already read into process memory. Does not return the binary, but instantly writes it to disk"

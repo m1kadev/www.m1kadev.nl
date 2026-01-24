@@ -27,11 +27,16 @@ defmodule Styles do
   end
 
   def compile(styles) do
+    t_begin = System.monotonic_time(:millisecond)
+
     ensure_file_structure(styles.project_root)
 
     styles.styles
     |> Task.async_stream(fn style -> compile_file(style, styles.project_root) end)
     |> Enum.map(fn {:ok, val} -> val end)
+
+    t_end = System.monotonic_time(:millisecond)
+    t_end - t_begin
   end
 
   # data | npx lightningcss -m

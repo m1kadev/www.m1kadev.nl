@@ -27,13 +27,16 @@ defmodule Scripts do
   end
 
   def compile(scripts) do
+    t_begin = System.monotonic_time(:millisecond)
+
     ensure_file_structure(scripts.project_root)
 
     scripts.scripts
     |> Task.async_stream(fn script -> compile_file(script, scripts.project_root) end)
     |> Enum.map(fn {:ok, val} -> val end)
 
-    :ok
+    t_end = System.monotonic_time(:millisecond)
+    t_end - t_begin
   end
 
   # data | npx lightningcss -m

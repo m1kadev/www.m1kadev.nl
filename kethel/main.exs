@@ -8,6 +8,8 @@ if folder != nil do
   File.rm_rf!("#{project_root}/build")
   File.mkdir_p("#{project_root}/build")
 
+  collection_time_start = System.monotonic_time(:millisecond)
+
   # other contents depend on this, so we cant async it
   bricks = Bricks.collect(project_root)
 
@@ -22,21 +24,50 @@ if folder != nil do
   [styles, pages, scripts, thoughts] =
     Task.await_many([styles_task, pages_task, scripts_task, thoughts_task], :infinity)
 
+  collection_time_end = System.monotonic_time(:millisecond)
+
+  compilation_time_start = System.monotonic_time(:millisecond)
+  
   pages_compile_task = Task.async(fn -> Pages.compile(pages) end)
   styles_compile_task = Task.async(fn -> Styles.compile(styles) end)
   scripts_compile_task = Task.async(fn -> Scripts.compile(scripts) end)
   thoughts_compile_task = Task.async(fn -> Thoughts.compile(thoughts) end)
 
-  Task.await_many(
+  [ pages_time, styles_time, scripts_time, thoughts_time] = Task.await_many(
     [
       pages_compile_task,
       styles_compile_task,
-      statics_task,
       scripts_compile_task,
       thoughts_compile_task
     ],
     :infinity
   )
+
+  compilation_time_end = System.monotonic_time(:millisecond)
+
+  rss_header = File.read!("#{project_root}/rss/feed.txml")
+  rss_footer = "</channel></rss>"
+  rss_item_template = File.read!("#{project_root}/rss/item.txml")
+
+  rss_thoughts = thoughts.thoughts
+    |> Enum.take(10)
+    |> Enum.map(fn thought -> Thoughts.to_rss(thought, rss_item_template, project_root) end)
+    |> Enum.join();
+
+  File.write!("#{project_root}/build/rss.xml", rss_header <> rss_thoughts <> rss_footer)
+
+  IO.puts("[COMPILED] #{project_root}/build/rss.xml")
+
+  IO.puts("Finalising...");
+
+  File.cp!("#{project_root}/favicon.ico", "#{project_root}/build/favicon.ico")
+  IO.puts("")
+  IO.puts(:stderr, "===== BUILD RESULTS =====")
+  IO.puts(:stderr, "FILE READING (*.collect()) | #{collection_time_end - collection_time_start}ms") 
+  IO.puts(:stderr, "Root page (compile)        | #{pages_time}ms")
+  IO.puts(:stderr, "Styles (compile)           | #{styles_time}ms")
+  IO.puts(:stderr, "Scripts (compile)          | #{scripts_time}ms")
+  IO.puts(:stderr, "Thoughts (compile)         | #{thoughts_time}ms")
 else
   IO.puts(:stderr, "The root project folder should be provided on the command line")
 end
