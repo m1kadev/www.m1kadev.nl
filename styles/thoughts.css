@@ -19,3 +19,7 @@
     text-align: right;
     display: block;
 }
+
+main hr:first-of-type {
+    display: none;
+}
