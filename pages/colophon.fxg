@@ -3,6 +3,9 @@
 == about == 
 
 you're looking at a <#https://en.wiktionary.org/wiki/beautiful#English beautiful> site, with <#https://caddyserver.com/ caddy> as its backend.
+
 the site generator is a home-grown non-gmo <#https://github.com/m1kadev/www.m1kadev.nl/tree/main/kethel/ elixir app>. the internal markup language is <#https://github.com/m1kadev/fxg fxg>, made to be more legible than markdown. 
+
 templating the final html is handled by <#https://mustache.github.io mustache>, a stateless templating library.
+
 css, js, and html parsing are handled by lightningcss, uglifyjs, and html-minifier-next, respectively.

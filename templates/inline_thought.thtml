@@ -1,0 +1,8 @@
+<hr>
+<div class="thought">
+    <h2> {{ &name }} </h2>
+    <span>
+        {{ thought }}
+    </span>
+    <small>-mika, {{ date }}</small>
+</div>

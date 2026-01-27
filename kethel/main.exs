@@ -57,6 +57,25 @@ if folder != nil do
   File.write!("#{project_root}/build/rss.xml", rss_header <> rss_thoughts <> rss_footer)
 
   IO.puts("[COMPILED] #{project_root}/build/rss.xml")
+  
+  { lcss_version, 0 }= System.cmd("npx", [ "lightningcss", "-V" ])
+  { hmn_version, 0 } = System.cmd("npx", [ "html-minifier-next", "-V" ])
+  { ujs_version, 0 } = System.cmd("npx", [ "uglifyjs", "-V" ])
+  { git_commit, 0 } = System.cmd("git", [ "rev-parse", "HEAD" ])
+
+  { build_date, 0 } = System.cmd("date", ["+%H:%M %d/%m/%y"])
+
+  info_txt = """
+  commit=#{git_commit}
+  lightningcss=#{lcss_version}
+  html_minifier_next=#{hmn_version}
+  uglifyjs=#{ujs_version}
+  build_time=#{build_date}
+  """
+  
+  File.write!("#{project_root}/build/info.txt", info_txt)
+
+  IO.puts("[COMPILED] #{project_root}/build/info.txt")
 
   IO.puts("Finalising...");
 
