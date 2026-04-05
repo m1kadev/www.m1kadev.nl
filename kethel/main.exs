@@ -27,21 +27,23 @@ if folder != nil do
   collection_time_end = System.monotonic_time(:millisecond)
 
   compilation_time_start = System.monotonic_time(:millisecond)
-  
+
   pages_compile_task = Task.async(fn -> Pages.compile(pages) end)
   styles_compile_task = Task.async(fn -> Styles.compile(styles) end)
   scripts_compile_task = Task.async(fn -> Scripts.compile(scripts) end)
   thoughts_compile_task = Task.async(fn -> Thoughts.compile(thoughts) end)
 
-  [ pages_time, styles_time, scripts_time, thoughts_time] = Task.await_many(
-    [
-      pages_compile_task,
-      styles_compile_task,
-      scripts_compile_task,
-      thoughts_compile_task
-    ],
-    :infinity
-  )
+  [pages_time, styles_time, scripts_time, thoughts_time, statics] =
+    Task.await_many(
+      [
+        pages_compile_task,
+        styles_compile_task,
+        scripts_compile_task,
+        thoughts_compile_task,
+        statics_task
+      ],
+      :infinity
+    )
 
   compilation_time_end = System.monotonic_time(:millisecond)
 
@@ -49,21 +51,22 @@ if folder != nil do
   rss_footer = "</channel></rss>"
   rss_item_template = File.read!("#{project_root}/rss/item.txml")
 
-  rss_thoughts = thoughts.thoughts
+  rss_thoughts =
+    thoughts.thoughts
     |> Enum.take(10)
     |> Enum.map(fn thought -> Thoughts.to_rss(thought, rss_item_template, project_root) end)
-    |> Enum.join();
+    |> Enum.join()
 
   File.write!("#{project_root}/build/rss.xml", rss_header <> rss_thoughts <> rss_footer)
 
   IO.puts("[COMPILED] #{project_root}/build/rss.xml")
-  
-  { lcss_version, 0 }= System.cmd("npx", [ "lightningcss", "-V" ])
-  { hmn_version, 0 } = System.cmd("npx", [ "html-minifier-next", "-V" ])
-  { ujs_version, 0 } = System.cmd("npx", [ "uglifyjs", "-V" ])
-  { git_commit, 0 } = System.cmd("git", [ "rev-parse", "HEAD" ])
 
-  { build_date, 0 } = System.cmd("date", ["+%H:%M %d/%m/%y"])
+  {lcss_version, 0} = System.cmd("npx", ["lightningcss", "-V"])
+  {hmn_version, 0} = System.cmd("npx", ["html-minifier-next", "-V"])
+  {ujs_version, 0} = System.cmd("npx", ["uglifyjs", "-V"])
+  {git_commit, 0} = System.cmd("git", ["rev-parse", "HEAD"])
+
+  {build_date, 0} = System.cmd("date", ["+%H:%M %d/%m/%y"])
 
   info_txt = """
   commit=#{git_commit}
@@ -72,17 +75,22 @@ if folder != nil do
   uglifyjs=#{ujs_version}
   build_time=#{build_date}
   """
-  
+
   File.write!("#{project_root}/build/info.txt", info_txt)
 
   IO.puts("[COMPILED] #{project_root}/build/info.txt")
 
-  IO.puts("Finalising...");
+  IO.puts("Finalising...")
 
   File.cp!("#{project_root}/favicon.ico", "#{project_root}/build/favicon.ico")
   IO.puts("")
   IO.puts(:stderr, "===== BUILD RESULTS =====")
-  IO.puts(:stderr, "FILE READING (*.collect()) | #{collection_time_end - collection_time_start}ms") 
+
+  IO.puts(
+    :stderr,
+    "FILE READING (*.collect()) | #{collection_time_end - collection_time_start}ms"
+  )
+
   IO.puts(:stderr, "Root page (compile)        | #{pages_time}ms")
   IO.puts(:stderr, "Styles (compile)           | #{styles_time}ms")
   IO.puts(:stderr, "Scripts (compile)          | #{scripts_time}ms")

@@ -1,0 +1,3 @@
+[submodule "fxg"]
+	path = fxg
+	url = https://codeberg.org/m1ka/fxg.git
